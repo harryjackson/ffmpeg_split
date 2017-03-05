@@ -1,4 +1,4 @@
-mport os
+import os
 import re
 import subprocess as sp
 from subprocess import *
