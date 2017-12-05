@@ -91,7 +91,7 @@ def convertChapters(chapters):
         '-vcodec', 'copy',
         '-acodec', 'copy',
         '-metadata',
-          'title="'+chap['title']+'"',
+          'title='+chap['title'],
         '-metadata',
           'track='+str(chap['num']),
         '-ss', chap['start'],
