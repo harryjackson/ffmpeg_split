@@ -52,7 +52,7 @@ def parseChapters(filename):
       m = None
 
     if m != None:
-      chapters.append({ "name": `num` + " - " + title, "start": m.group(2), "end": m.group(3)})
+      chapters.append({ "num": num, "title": title, "start": m.group(2), "end": m.group(3)})
       num += 1
 
   return chapters
@@ -70,11 +70,14 @@ def getChapters():
 
   os.mkdir(path + "/" + newdir)
 
+  leading_zeros_size = len(str(len(chapters)))
   for chap in chapters:
-    chap['name'] = chap['name'].replace('/',':')
-    chap['name'] = chap['name'].replace("'","\'")
+    chap['title'] = chap['title'].replace('/',':')
+    chap['title'] = chap['title'].replace("'","\'")
     print "start:" +  chap['start']
-    chap['outfile'] = path + "/" + newdir + "/" + re.sub("[^-a-zA-Z0-9_.():' ]+", '', chap['name']) + fext
+    
+    outfilename = str(chap['num']).zfill(leading_zeros_size) + ' - ' + chap['title']
+    chap['outfile'] = path + "/" + newdir + "/" + re.sub("[^-a-zA-Z0-9_.():' ]+", '', outfilename) + fext
     chap['origfile'] = options.infile
     print chap['outfile']
   return chapters
@@ -87,6 +90,10 @@ def convertChapters(chapters):
         "ffmpeg", '-i', chap['origfile'],
         '-vcodec', 'copy',
         '-acodec', 'copy',
+        '-metadata',
+          'title="'+chap['title']+'"',
+        '-metadata',
+          'track='+str(chap['num']),
         '-ss', chap['start'],
         '-to', chap['end'],
         chap['outfile']]
