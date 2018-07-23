@@ -64,7 +64,7 @@ def get_chapters(infile):
     path = os.path.split(infile)
     newdir, fext = os.path.splitext(os.path.basename(infile))
 
-    os.mkdir(path + "/" + newdir)
+    os.mkdir(path[0] + "/" + newdir)
 
     leading_zeros_size = len(str(len(_chapters)))
     for chap in _chapters:
@@ -75,8 +75,8 @@ def get_chapters(infile):
             str(chap['num']).zfill(leading_zeros_size),
             chap['title']
         )
-        chap['outfile'] = "{}/{}/{}.{}".format(
-            path,
+        chap['outfile'] = "{}/{}/{}{}".format(
+            path[0],
             newdir,
             re.sub("[^-a-zA-Z0-9_.():' ]+", '', outfilename),
             fext
