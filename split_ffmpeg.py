@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+#
 import os
 import re
 import pprint
@@ -20,17 +21,17 @@ def parseChapters(filename):
     # when it does not get one so we need to capture stderr,
     # not stdout.
     output = sp.check_output(command, stderr=sp.STDOUT, universal_newlines=True)
-  except CalledProcessError, e:
+  except CalledProcessError as e:
     output = e.output
 
   num = 1
 
   for line in iter(output.splitlines()):
     x = re.match(r".*title.*: (.*)", line)
-    print "x:"
+    print ("x:")
     pprint.pprint(x)
 
-    print "title:"
+    print ("title:")
     pprint.pprint(title)
 
     if x == None:
@@ -42,7 +43,7 @@ def parseChapters(filename):
     if m1 != None:
       chapter_match = m1
 
-    print "chapter_match:"
+    print ("chapter_match:")
     pprint.pprint(chapter_match)
 
     if title != None and chapter_match != None:
@@ -52,7 +53,7 @@ def parseChapters(filename):
       m = None
 
     if m != None:
-      chapters.append({ "name": `num` + " - " + title, "start": m.group(2), "end": m.group(3)})
+      chapters.append({ "name": repr(num) + " - " + title, "start": m.group(2), "end": m.group(3)})
       num += 1
 
   return chapters
@@ -60,29 +61,45 @@ def parseChapters(filename):
 def getChapters():
   parser = OptionParser(usage="usage: %prog [options] filename", version="%prog 1.0")
   parser.add_option("-f", "--file",dest="infile", help="Input File", metavar="FILE")
+  parser.add_option("-w", "--write", action="store_true", dest="overwrite", \
+                    help="Force overwrite")
+  parser.add_option("-v", action="store_true", dest="verbose", help="Verbose")
+  parser.add_option("-q", action="store_false", dest="verbose", help="Quiet")
+
   (options, args) = parser.parse_args()
   if not options.infile:
     parser.error('Filename required')
   chapters = parseChapters(options.infile)
   fbase, fext = os.path.splitext(options.infile)
-  path, file = os.path.split(options.infile)
-  newdir, fext = os.path.splitext( basename(options.infile) )
+  path = os.path.dirname(options.infile)
+  newdir = os.path.join(path, fbase)
 
-  os.mkdir(path + "/" + newdir)
+  # Make the directory for output
+  try: 
+    os.mkdir(newdir)
+  except FileExistsError:
+    if not options.overwrite:
+      raise("Output directory" + newdir + " already exists, use -w option to overwrite")
+    else: 
+      pass
 
   for chap in chapters:
     chap['name'] = chap['name'].replace('/',':')
     chap['name'] = chap['name'].replace("'","\'")
-    print "start:" +  chap['start']
-    chap['outfile'] = path + "/" + newdir + "/" + re.sub("[^-a-zA-Z0-9_.():' ]+", '', chap['name']) + fext
+    print ("start:" +  chap['start'])
+    chap['outfile'] = os.path.join(newdir, \
+                                   re.sub("[^-a-zA-Z0-9_.():' ]+", '', chap['name']) \
+                                   + fext \
+                                  )
+    print (chap['outfile'])
     chap['origfile'] = options.infile
-    print chap['outfile']
+    print (chap['outfile'])
   return chapters
 
 def convertChapters(chapters):
   for chap in chapters:
-    print "start:" +  chap['start']
-    print chap
+    print ("start:" +  chap['start'])
+    print (chap)
     command = [
         "ffmpeg", '-i', chap['origfile'],
         '-vcodec', 'copy',
@@ -95,7 +112,7 @@ def convertChapters(chapters):
       # ffmpeg requires an output file and so it errors
       # when it does not get one
       output = sp.check_output(command, stderr=sp.STDOUT, universal_newlines=True)
-    except CalledProcessError, e:
+    except CalledProcessError as e:
       output = e.output
       raise RuntimeError("command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
 
