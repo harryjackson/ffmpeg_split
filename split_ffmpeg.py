@@ -60,40 +60,40 @@ def parseChapters(filename):
 
 def getChapters():
   parser = OptionParser(usage="usage: %prog [options] filename", version="%prog 1.0")
-  parser.add_option("-f", "--file",dest="infile", help="Input File", metavar="FILE")
-  parser.add_option("-w", "--write", action="store_true", dest="overwrite", \
+  parser.add_option("-f", "--force", action="store_true", dest="overwrite", \
                     help="Force overwrite")
-  parser.add_option("-v", action="store_true", dest="verbose", help="Verbose")
-  parser.add_option("-q", action="store_false", dest="verbose", help="Quiet")
+  parser.add_option("-v", "--verbose", action="store_true", dest="verbose", help="Verbose")
+  parser.add_option("-q", "--quiet", action="store_false", dest="verbose", help="Quiet")
 
   (options, args) = parser.parse_args()
-  if not options.infile:
-    parser.error('Filename required')
-  chapters = parseChapters(options.infile)
-  fbase, fext = os.path.splitext(options.infile)
-  path = os.path.dirname(options.infile)
-  newdir = os.path.join(path, fbase)
+  for infile in args: 
+      fbase, fext = os.path.splitext(infile)
+      path = os.path.dirname(infile)
+      newdir = os.path.join(path, fbase)
 
-  # Make the directory for output
-  try: 
-    os.mkdir(newdir)
-  except FileExistsError:
-    if not options.overwrite:
-      raise("Output directory" + newdir + " already exists, use -w option to overwrite")
-    else: 
-      pass
+      # Make the directory for output
+      try: 
+        os.mkdir(newdir)
+      except FileExistsError:
+        if not options.overwrite:
+          print("Output directory " + newdir + " already exists, use -w option to overwrite")
+          sys.exit(1)
+        else: 
+          pass
 
-  for chap in chapters:
-    chap['name'] = chap['name'].replace('/',':')
-    chap['name'] = chap['name'].replace("'","\'")
-    print ("start:" +  chap['start'])
-    chap['outfile'] = os.path.join(newdir, \
-                                   re.sub("[^-a-zA-Z0-9_.():' ]+", '', chap['name']) \
-                                   + fext \
-                                  )
-    print (chap['outfile'])
-    chap['origfile'] = options.infile
-    print (chap['outfile'])
+      chapters = parseChapters(infile)
+
+      for chap in chapters:
+        chap['name'] = chap['name'].replace('/',':')
+        chap['name'] = chap['name'].replace("'","\'")
+        print ("start:" +  chap['start'])
+        chap['outfile'] = os.path.join(newdir, \
+                                       re.sub("[^-a-zA-Z0-9_.():' ]+", '', chap['name']) \
+                                       + fext \
+                                       )
+        print (chap['outfile'])
+        chap['origfile'] = infile
+        print (chap['outfile'])
   return chapters
 
 def convertChapters(chapters):
