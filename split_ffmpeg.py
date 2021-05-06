@@ -64,11 +64,16 @@ def getChapters():
                     help="Force overwrite")
   parser.add_option("-v", "--verbose", action="store_true", dest="verbose", help="Verbose")
   parser.add_option("-q", "--quiet", action="store_false", dest="verbose", help="Quiet")
-
+  parser.add_option("-d", "--dir", dest="dir", help="Output directory")
+  
   (options, args) = parser.parse_args()
   for infile in args: 
       fbase, fext = os.path.splitext(infile)
-      path = os.path.dirname(infile)
+      if options.dir is None:
+        path = os.path.dirname(infile)
+      else: 
+        path = options.dir
+
       newdir = os.path.join(path, fbase)
 
       # Make the directory for output
