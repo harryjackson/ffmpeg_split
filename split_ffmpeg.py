@@ -81,7 +81,8 @@ def getChapters():
         os.mkdir(newdir)
       except FileExistsError:
         if not options.overwrite:
-          print("Output directory " + newdir + " already exists, use -w option to overwrite")
+          print("Output directory " + newdir + \
+                " already exists, use -f option to force overwrite")
           sys.exit(1)
         else: 
           pass
