@@ -9,6 +9,8 @@ from os.path import basename
 from subprocess import *
 from optparse import OptionParser
 
+
+
 def parseChapters(filename):
   chapters = []
   command = [ "ffmpeg", '-i', filename]
@@ -62,8 +64,8 @@ def getChapters():
   parser = OptionParser(usage="usage: %prog [options] [FILE]...", version="%prog 1.0")
   parser.add_option("-f", "--force", action="store_true", dest="overwrite", \
                     help="Force overwrite")
-  parser.add_option("-v", "--verbose", action="store_true", dest="verbose", help="Verbose")
-  parser.add_option("-q", "--quiet", action="store_false", dest="verbose", help="Quiet")
+#  parser.add_option("-v", "--verbose", action="store_true", dest="verbose", help="Verbose")
+#  parser.add_option("-q", "--quiet", action="store_false", dest="verbose", help="Quiet")
   parser.add_option("-d", "--dir", dest="dir", help="Output directory")
   
   (options, args) = parser.parse_args()
