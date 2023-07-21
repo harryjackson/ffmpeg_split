@@ -85,13 +85,21 @@ def convertChapters(chapters, encode):
   for chap in chapters:
     print("start:" +  chap['start'])
     print(chap)
+
+    name = chap['outfile']
+    shortened_filename = ""
+    ext_index = name.rfind('.')
+    ext = name[ext_index+1:]
+    name_wo_ext = name[0:ext_index]
+    shortened_filename = name_wo_ext[0:255-len(ext)-1] + "." + ext
+    
     if encode:
         command = [
             "ffmpeg", '-i', chap['origfile'],
             '-ss', chap['start'],
             '-to', chap['end'],
             '-c:v', 'libx264',
-            chap['outfile']]
+            shortened_filename]
     else:
         command = [
         "ffmpeg", '-i', chap['origfile'],
@@ -99,7 +107,7 @@ def convertChapters(chapters, encode):
         '-acodec', 'copy',
         '-ss', chap['start'],
         '-to', chap['end'],
-        chap['outfile']]
+        shortened_filename]
     output = ""
     try:
       # ffmpeg requires an output file and so it errors
