@@ -52,6 +52,11 @@ def parseChapters(filename):
       m = None
 
     if m != None:
+      # make sure first chapter starts at 0, otherwise make one
+      if (num == 1) and (m.group(2) != 0):
+        chapters.append({ "name": str(num) + " - " + "00", "start": "0.0", "end": m.group(2)})
+        num += 1
+
       chapters.append({ "name": str(num) + " - " + title, "start": m.group(2), "end": m.group(3)})
       num += 1
 
