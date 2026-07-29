@@ -108,8 +108,10 @@ def convertChapters(chapters):
         print(chap)
         command = [
             "ffmpeg", '-i', chap['origfile'],
+            '-map', '0',
             '-vcodec', 'copy',
             '-acodec', 'copy',
+            '-scodec', 'copy',
             '-ss', chap['start'],
             '-to', chap['end'],
             chap['outfile']]
